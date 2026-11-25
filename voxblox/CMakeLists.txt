@@ -75,7 +75,7 @@ install(DIRECTORY include/
 )
 
 install(FILES ${PROTO_HDRS}
-  DESTINATION include/voxblox
+  DESTINATION include
 )
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
