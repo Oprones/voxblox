@@ -363,8 +363,7 @@ void TsdfServer::insertPointcloud(
   }
 
   if (verbose_) {
-    RCLCPP_INFO(node_->get_logger(), "Timings:
-%s",
+    RCLCPP_INFO(node_->get_logger(), "Timings:\n%s",
                 timing::Timing::Print().c_str());
     RCLCPP_INFO(node_->get_logger(), "Layer memory: %zu",
                 tsdf_map_->getTsdfLayer().getMemorySize());
@@ -522,8 +521,7 @@ bool TsdfServer::generateMesh() {
                 mesh_filename_.c_str());
   }
 
-  RCLCPP_INFO(node_->get_logger(), "Mesh Timings:
-%s",
+  RCLCPP_INFO(node_->get_logger(), "Mesh Timings:\n%s",
               timing::Timing::Print().c_str());
   return true;
 }
