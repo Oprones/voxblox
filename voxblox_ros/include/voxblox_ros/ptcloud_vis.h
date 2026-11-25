@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <string>
 
-#include <eigen_conversions/eigen_msg.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <geometry_msgs/msg/point.hpp>

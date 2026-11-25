@@ -24,7 +24,6 @@
 #ifndef VOXBLOX_ROS_MESH_VIS_H_
 #define VOXBLOX_ROS_MESH_VIS_H_
 
-#include <eigen_conversions/eigen_msg.h>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -275,7 +274,7 @@ inline void fillMarkerWithMesh(const MeshLayer::ConstPtr& mesh_layer,
 
     for (size_t i = 0u; i < mesh->vertices.size(); i++) {
       geometry_msgs::msg::Point point_msg;
-      tf::pointEigenToMsg(mesh->vertices[i].cast<double>(), point_msg);
+      point_msg.x = mesh->vertices[i].x(); point_msg.y = mesh->vertices[i].y(); point_msg.z = mesh->vertices[i].z();
       marker->points.push_back(point_msg);
       marker->colors.push_back(getVertexColor(mesh, color_mode, i));
     }
