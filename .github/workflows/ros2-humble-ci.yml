@@ -1,0 +1,37 @@
+name: ROS 2 Humble CI
+
+on:
+  pull_request:
+    branches: [ros2-humble]
+  push:
+    branches: [ros2-humble]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  colcon-build:
+    name: "colcon build (Humble Full)"
+    runs-on: ubuntu-22.04
+    container:
+      image: ros:humble-ros-base
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          path: src/voxblox
+      - name: Checkout Oprones/minkindr (feature/ros2-humble)
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: Oprones/minkindr
+          ref: feature/ros2-humble
+          path: src/minkindr
+      - name: Install system & ROS 2 deps
+        shell: bash
+        run: |
+          apt-get update && apt-get install -y             libeigen3-dev libgoogle-glog-dev libgflags-dev             libprotobuf-dev protobuf-compiler libpcl-dev             ros-humble-pcl-conversions ros-humble-tf2-ros ros-humble-visualization-msgs
+      - name: Build minkindr, voxblox_msgs, voxblox, voxblox_ros
+        shell: bash
+        run: |
+          source /opt/ros/humble/setup.bash
+          colcon build --packages-select minkindr voxblox_msgs voxblox voxblox_ros

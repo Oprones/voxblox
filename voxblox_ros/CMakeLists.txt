@@ -1,59 +1,81 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.16)
 project(voxblox_ros)
 
-find_package(catkin_simple REQUIRED)
-catkin_simple(ALL_DEPS_REQUIRED)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare)
 
-add_definitions(-std=c++14 -Wall -Wextra)
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(pcl_conversions REQUIRED)
+find_package(PCL REQUIRED COMPONENTS common filters)
+find_package(Eigen3 REQUIRED)
+find_package(minkindr REQUIRED)
+find_package(voxblox REQUIRED)
+find_package(voxblox_msgs REQUIRED)
+find_package(glog REQUIRED)
+find_package(gflags REQUIRED)
 
-#############
-# LIBRARIES #
-#############
-cs_add_library(${PROJECT_NAME}
-  src/esdf_server.cc
-  src/interactive_slider.cc
-  src/simulation_server.cc
-  src/intensity_server.cc
+add_library(${PROJECT_NAME} SHARED
   src/transformer.cc
   src/tsdf_server.cc
+  src/esdf_server.cc
+)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+  ${PCL_INCLUDE_DIRS}
+)
+ament_target_dependencies(${PROJECT_NAME}
+  rclcpp
+  sensor_msgs
+  std_msgs
+  std_srvs
+  geometry_msgs
+  visualization_msgs
+  tf2
+  tf2_ros
+  pcl_conversions
+  minkindr
+  voxblox
+  voxblox_msgs
+)
+target_link_libraries(${PROJECT_NAME}
+  ${PCL_LIBRARIES}
+  glog::glog
+  gflags
 )
 
-############
-# BINARIES #
-############
-
-cs_add_executable(voxblox_eval
-  src/voxblox_eval.cc
-)
-target_link_libraries(voxblox_eval ${PROJECT_NAME})
-
-cs_add_executable(tsdf_server
-  src/tsdf_server_node.cc
-)
+add_executable(tsdf_server src/tsdf_server_node.cc)
 target_link_libraries(tsdf_server ${PROJECT_NAME})
 
-cs_add_executable(esdf_server
-  src/esdf_server_node.cc
-)
+add_executable(esdf_server src/esdf_server_node.cc)
 target_link_libraries(esdf_server ${PROJECT_NAME})
 
-cs_add_executable(intensity_server
-  src/intensity_server_node.cc
+install(TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
 )
-target_link_libraries(intensity_server ${PROJECT_NAME})
-
-cs_add_executable(simulation_eval
-  src/simulation_eval.cc
+install(TARGETS tsdf_server esdf_server
+  DESTINATION lib/${PROJECT_NAME}
 )
-target_link_libraries(simulation_eval ${PROJECT_NAME})
-
-cs_add_executable(visualize_tsdf
-  src/visualize_tsdf.cc
+install(DIRECTORY include/
+  DESTINATION include
 )
-target_link_libraries(visualize_tsdf ${PROJECT_NAME})
 
-##########
-# EXPORT #
-##########
-cs_install()
-cs_export()
+ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ament_export_include_directories(include)
+ament_export_dependencies(
+  rclcpp sensor_msgs std_msgs std_srvs geometry_msgs visualization_msgs
+  tf2 tf2_ros pcl_conversions minkindr voxblox voxblox_msgs glog gflags
+)
+ament_package()
