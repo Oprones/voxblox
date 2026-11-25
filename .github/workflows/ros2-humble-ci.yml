@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   colcon-build:
-    name: colcon build (Humble Core + Msgs)
+    name: colcon build (Humble Full: minkindr + voxblox_msgs + voxblox + voxblox_ros)
     runs-on: ubuntu-22.04
     container:
       image: ros:humble-ros-base
@@ -26,11 +26,12 @@ jobs:
           repository: Oprones/minkindr
           ref: feature/ros2-humble
           path: src/minkindr
-      - name: Install system deps
+      - name: Install system & ROS 2 deps
         shell: bash
-        run: apt-get update && apt-get install -y libeigen3-dev libgoogle-glog-dev libgflags-dev libprotobuf-dev protobuf-compiler
-      - name: Build minkindr, voxblox_msgs, voxblox
+        run: |
+          apt-get update && apt-get install -y             libeigen3-dev libgoogle-glog-dev libgflags-dev             libprotobuf-dev protobuf-compiler libpcl-dev             ros-humble-pcl-conversions ros-humble-tf2-ros ros-humble-visualization-msgs
+      - name: Build minkindr, voxblox_msgs, voxblox, voxblox_ros
         shell: bash
         run: |
           source /opt/ros/humble/setup.bash
-          colcon build --packages-select minkindr voxblox_msgs voxblox
+          colcon build --packages-select minkindr voxblox_msgs voxblox voxblox_ros
